@@ -190,3 +190,10 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 59987d8af9538fd488c1de2d71211075, type: 3}
   m_Name: 
+  line1:
+  - {x: -8.92000008, y: -2}
+  - {x: -6, y: -5}
+  - {x: 0, y: 0}
+  - {x: 5, y: 5}
+  radius: 1
+  material: {fileID: 2100000, guid: 181e733ba4583124089ea99d91833b0a, type: 2}
