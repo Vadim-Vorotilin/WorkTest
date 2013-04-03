@@ -27,7 +27,7 @@ RenderSettings:
   m_SpotCookie: {fileID: 0}
   m_ObjectHideFlags: 0
 --- !u!127 &3
-GameManager:
+LevelGameManager:
   m_ObjectHideFlags: 0
 --- !u!157 &4
 LightmapSettings:
@@ -191,9 +191,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59987d8af9538fd488c1de2d71211075, type: 3}
   m_Name: 
   line1:
-  - {x: -8.92000008, y: -2}
-  - {x: -6, y: -5}
-  - {x: 0, y: 0}
-  - {x: 5, y: 5}
+  - {x: -.370000005, y: -2}
+  - {x: -6, y: -4.03000021}
+  - {x: 0, y: 3.88000011}
+  - {x: 5, y: 1.72000003}
   radius: 1
   material: {fileID: 2100000, guid: 181e733ba4583124089ea99d91833b0a, type: 2}

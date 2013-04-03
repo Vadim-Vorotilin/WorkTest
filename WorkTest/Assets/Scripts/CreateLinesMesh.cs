@@ -64,6 +64,8 @@ public class CreateLinesMesh : MonoBehaviour {
 			if (IsCross(central, central + dir1, central + norm, central + dir1 + lastNorm))
 				norm = -norm;
 
+			lastNorm = norm;
+
 			verts[i * 3] = central;
 			verts[i * 3 + 1] = central + norm * radius;
 			verts[i * 3 + 2] = central - norm * radius;
@@ -167,9 +169,19 @@ public class CreateLinesMesh : MonoBehaviour {
 
 			norm.Normalize();
 
+			//if (i == 3) {
+			//	Gizmos.color = Color.gray;
+			//	Gizmos.DrawLine(central, central + dir1);
+
+			//	Gizmos.color = Color.black;
+			//	Gizmos.DrawLine(central + norm * radius, central + dir1 + lastNorm * radius);
+			//}
+
 			if (IsCross(central, central + dir1, central + norm, central + dir1 + lastNorm)) {
 				norm = -norm;
 			}
+
+			lastNorm = norm;
 
 			Gizmos.color = Color.blue;
 			Gizmos.DrawLine(central, central + norm * radius);
