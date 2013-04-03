@@ -5,19 +5,30 @@ using System.Collections;
 public class CreateLinesMesh : MonoBehaviour {
 
 	public List<Vector2> line1;
+	public List<Vector2> line2;
+
 	public float radius;
 
 	public Material material;
 
 	// Use this for initialization
 	void Start () {
-		gameObject.AddComponent<MeshFilter>().mesh = CreateLineMesh(line1, radius);
+		Mesh mesh = new Mesh();
+
+		CombineInstance[] combine = new CombineInstance[2];
+		combine[0].mesh = CreateLineMesh(line1, radius, true);
+		combine[1].mesh = CreateLineMesh(line2, radius, false);
+
+		mesh.CombineMeshes(combine, true, false);
+
+		gameObject.AddComponent<MeshFilter>().mesh = mesh;
+
 		gameObject.AddComponent<MeshRenderer>();
 
 		renderer.material = material;
 	}
 
-	private static Mesh CreateLineMesh (List<Vector2> line, float radius) {
+	private static Mesh CreateLineMesh (List<Vector2> line, float radius, bool front) {
 		int centalVertsCount = line.Count + 2;
 		int vertsCount = (centalVertsCount) * 3;
 
@@ -70,7 +81,7 @@ public class CreateLinesMesh : MonoBehaviour {
 			verts[i * 3 + 1] = central + norm * currentRadius;
 			verts[i * 3 + 2] = central - norm * currentRadius;
 
-			norms[i * 3] = norms[i * 3 + 1] = norms[i * 3 + 2] = Vector3.back;
+			norms[i * 3] = norms[i * 3 + 1] = norms[i * 3 + 2] = Vector3.forward;
 
 			uv[i * 3] = (i != 0 && i != centalVertsCount - 1) ? new Vector2(0.5f, 0.5f) : (i == 0 ? new Vector2(0f, 0.5f) : new Vector2(1f, 0.5f));
 			uv[i * 3 + 1] = (i != 0 && i != centalVertsCount - 1) ? new Vector2(0.5f, 1f) : (i == 0 ? new Vector2(0f, 1f) : new Vector2(1f, 1f));
@@ -79,21 +90,24 @@ public class CreateLinesMesh : MonoBehaviour {
 			if (i == 0) 
 				continue;
 
-			tris[(i - 1) * 4 * 3] = i * 3;
+			int seq1 = front ? 2 : 0;
+			int seq2 = front ? -2 : 0;
+
+			tris[(i - 1) * 4 * 3 + seq1] = i * 3;
 			tris[(i - 1) * 4 * 3 + 1] = i * 3 + 2;
-			tris[(i - 1) * 4 * 3 + 2] = (i - 1) * 3 + 2;
+			tris[(i - 1) * 4 * 3 + 2 + seq2] = (i - 1) * 3 + 2;
 
-			tris[(i - 1) * 4 * 3 + 3] = i * 3;
+			tris[(i - 1) * 4 * 3 + 3 + seq1] = i * 3;
 			tris[(i - 1) * 4 * 3 + 4] = (i - 1) * 3 + 2;
-			tris[(i - 1) * 4 * 3 + 5] = (i - 1) * 3;
+			tris[(i - 1) * 4 * 3 + 5 + seq2] = (i - 1) * 3;
 
-			tris[(i - 1) * 4 * 3 + 6] = i * 3;
+			tris[(i - 1) * 4 * 3 + 6 + seq1] = i * 3;
 			tris[(i - 1) * 4 * 3 + 7] = (i - 1) * 3 + 1;
-			tris[(i - 1) * 4 * 3 + 8] = i * 3 + 1;
+			tris[(i - 1) * 4 * 3 + 8 + seq2] = i * 3 + 1;
 
-			tris[(i - 1) * 4 * 3 + 9] = i * 3;
+			tris[(i - 1) * 4 * 3 + 9 + seq1] = i * 3;
 			tris[(i - 1) * 4 * 3 + 10] = (i - 1) * 3;
-			tris[(i - 1) * 4 * 3 + 11] = (i - 1) * 3 + 1;
+			tris[(i - 1) * 4 * 3 + 11 + seq2] = (i - 1) * 3 + 1;
 		}
 
 		mesh.vertices = verts;
