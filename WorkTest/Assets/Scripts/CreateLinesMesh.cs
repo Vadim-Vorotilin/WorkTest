@@ -51,9 +51,6 @@ public class CreateLinesMesh : MonoBehaviour {
 
 			Vector2 central = (i != 0 && i != centalVertsCount - 1) ? line[i - 1] : (i == 0 ? line[0] + dir1.normalized * radius : line[line.Count - 1] + dir2.normalized * radius);
 
-			//Vector2 dir1n = dir1.normalized;
-			//Vector2 dir2n = dir2.normalized;
-
 			Vector2 norm = dir1.normalized + dir2.normalized;
 
 			if (norm.sqrMagnitude < 0.001f)
@@ -66,9 +63,12 @@ public class CreateLinesMesh : MonoBehaviour {
 
 			lastNorm = norm;
 
+			float angle = Vector2.Angle(dir1, dir2) / 2f;
+			float currentRadius = radius / Mathf.Sin(angle * Mathf.Deg2Rad);
+
 			verts[i * 3] = central;
-			verts[i * 3 + 1] = central + norm * radius;
-			verts[i * 3 + 2] = central - norm * radius;
+			verts[i * 3 + 1] = central + norm * currentRadius;
+			verts[i * 3 + 2] = central - norm * currentRadius;
 
 			norms[i * 3] = norms[i * 3 + 1] = norms[i * 3 + 2] = Vector3.back;
 
@@ -183,11 +183,14 @@ public class CreateLinesMesh : MonoBehaviour {
 
 			lastNorm = norm;
 
+			float angle = Vector2.Angle(dir1, dir2) / 2f;
+			float currentRadius = radius / Mathf.Sin(angle * Mathf.Deg2Rad);
+
 			Gizmos.color = Color.blue;
-			Gizmos.DrawLine(central, central + norm * radius);
+			Gizmos.DrawLine(central, central + norm * currentRadius);
 
 			Gizmos.color = Color.yellow;
-			Gizmos.DrawLine(central, central - norm * radius);
+			Gizmos.DrawLine(central, central - norm * currentRadius);
 
 			if (i == 0)
 				continue;
