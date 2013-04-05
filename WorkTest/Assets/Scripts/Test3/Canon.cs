@@ -4,8 +4,8 @@ using System.Collections;
 
 public class Canon : MonoBehaviour {
 
-	private const float DerivDelta = 0.000001f;
-	private const float NewtonError = 0.000001f;
+	private const float DerivDelta = 0.0001f;
+	private const float NewtonError = 0.00001f;
 
 	public float ammoSpeed;
 	public Rigidbody ammo;

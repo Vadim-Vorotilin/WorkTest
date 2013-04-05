@@ -164,7 +164,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1556938043}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -1.61000001, z: 0}
+  m_LocalPosition: {x: 0, y: 5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -217,7 +217,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1803588529}
   m_LocalRotation: {x: -.270598084, y: .65328151, z: .270598084, w: .65328151}
-  m_LocalPosition: {x: -10, y: 0, z: 0}
+  m_LocalPosition: {x: -20, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 2058047928}
@@ -233,7 +233,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dbffb62ff1652184ca703b065b1699ab, type: 3}
   m_Name: 
-  ammoSpeed: 20
+  ammoSpeed: 30
   ammo: {fileID: 5400000, guid: ff6562bb163b38247b4d23729e655c6f, type: 2}
   launchPos: {fileID: 883000631}
   target: {fileID: 1556938048}
