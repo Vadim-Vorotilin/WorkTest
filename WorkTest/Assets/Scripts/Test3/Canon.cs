@@ -1,11 +1,11 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
-using System.Collections;
 
 public class Canon : MonoBehaviour {
 
 	private const float DerivDelta = 0.0001f;
-	private const float NewtonError = 0.00001f;
+	private const float NewtonError = 0.0001f;
 
 	public float ammoSpeed;
 	public Rigidbody ammo;
@@ -17,12 +17,28 @@ public class Canon : MonoBehaviour {
 	private Vector2 targetStPos;
 	private float gravity;
 
+	private float AmmoX (float k, float t) {
+		return canonStPos.x + (1f / Mathf.Sqrt(1 + k * k)) * ammoSpeed * t;
+	}
+
+	private float TargetX (float k, float t) {
+		return targetStPos.x + target.xSpeed;
+	}
+
 	private float FuncX (float k, float t) {
-		return canonStPos.x - targetStPos.x - target.xSpeed + (1f / Mathf.Sqrt(1 + k * k)) * ammoSpeed * t;
+		return AmmoX(k, t) - TargetX(k, t);
+	}
+
+	private float AmmoY (float k, float t) {
+		return canonStPos.y + (k / Mathf.Sqrt(1 + k * k)) * ammoSpeed * t - (gravity * t * t) / 2f;
+	}
+
+	private float TargetY (float k, float t) {
+		return targetStPos.y;
 	}
 
 	private float FuncY (float k, float t) {
-		return canonStPos.y - targetStPos.y + (k / Mathf.Sqrt(1 + k * k)) * ammoSpeed * t - (gravity * t * t) / 2f;
+		return AmmoY(k, t) - TargetY(k, t);
 	}
 
 	private float FunkXVec (Vector2 vec) {
@@ -38,11 +54,18 @@ public class Canon : MonoBehaviour {
 		targetStPos = target.transform.position;
 		gravity = -Physics.gravity.y;
 
-		Debug.Log(string.Format("Canon: {0}, Target: {1}, Gravity: {2}", canonStPos, targetStPos.x, gravity));
+		Debug.Log(string.Format("Canon: {0}, Target: {1}, Gravity: {2}", canonStPos, targetStPos, gravity));
 
 		Vector2 initApprox = new Vector2(0.5f, Vector2.Distance(canonStPos, targetStPos) / (ammoSpeed - target.xSpeed));
 
 		Vector2 newton = Newton(FunkXVec, FunkYVec, initApprox, NewtonError);
+
+		Debug.Log(string.Format("X: {0}, Y: {1}", FunkXVec(newton), FunkYVec(newton)));
+
+		if (float.IsInfinity(newton.x) || float.IsNaN(newton.x) || newton.y < 0) {
+			Debug.LogWarning("Target can't be reached!");
+			return;
+		}
 
 		float angle = Mathf.Atan(newton.x) * Mathf.Rad2Deg;
 
@@ -54,6 +77,9 @@ public class Canon : MonoBehaviour {
 			Debug.LogError("Ammo instance = null!");
 			return;
 		}
+
+		points1.Add(new Vector2(TargetX(newton.x, newton.y), TargetY(newton.x, newton.y)));
+		points2.Add(new Vector2(AmmoX(newton.x, newton.y), AmmoY(newton.x, newton.y)));
 
 		ammoInst.AddForce(Quaternion.AngleAxis(angle, Vector3.forward) * Vector3.right * ammoSpeed, ForceMode.VelocityChange);
 	}
@@ -75,7 +101,7 @@ public class Canon : MonoBehaviour {
 			                     new Vector2(-func1(last) + deriv11 * last.x + deriv12 * last.y,
 			                                 -func2(last) + deriv21 * last.x + deriv22 * last.y));
 
-		} while (Vector2.Distance(last, current) > error);
+		} while (Mathf.Abs(last.x - current.x) > error || Mathf.Abs(last.y - current.y) > error);
 
 		return current;
 	}
@@ -98,6 +124,34 @@ public class Canon : MonoBehaviour {
 	void OnGUI () {
 		if (GUI.Button(new Rect(10, 10, 100, 50), "Launch")) {
 			Launch();
+		}
+	}
+
+	void Start () {
+		points1 = new List<Vector2>();
+		points2 = new List<Vector2>();
+	}
+
+	private List<Vector2> points1;
+	private List<Vector2> points2;
+
+	void OnDrawGizmos () {
+		if (points1 == null)
+			points1 = new List<Vector2>();
+
+		if (points2 == null)
+			points2 = new List<Vector2>();
+
+		Gizmos.color = Color.red;
+
+		for (int i = 0; i != points1.Count; i++) {
+			Gizmos.DrawWireSphere(points1[i], 0.1f);
+		}
+
+		Gizmos.color = Color.green;
+
+		for (int i = 0; i != points2.Count; i++) {
+			Gizmos.DrawWireSphere(points2[i], 0.1f);
 		}
 	}
 }
