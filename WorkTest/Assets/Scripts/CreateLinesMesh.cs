@@ -145,7 +145,18 @@ public class CreateLinesMesh : MonoBehaviour {
 	
 	}
 
+	private void DrawLine (List<Vector2> line, Color color) {
+		Gizmos.color = color;
+
+		for (int i = 1; i != line.Count; i++) {
+			Gizmos.DrawLine(line[i - 1], line[i]);
+		}
+	}
+
 	void OnDrawGizmos () {
+		DrawLine(line1, Color.red);
+		DrawLine(line2, Color.green);
+
 		int centalVertsCount = line1.Count + 2;
 		
 		Vector2 lastNorm = Vector2.zero;
