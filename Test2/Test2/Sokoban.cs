@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Test2 {
@@ -7,8 +8,8 @@ namespace Test2 {
 
 		private class Point {
 
-			public int x;
-			public int y;
+			public readonly int x;
+			public readonly int y;
 
 			public Point () { }
 
@@ -22,16 +23,16 @@ namespace Test2 {
 			/// </summary>
 			/// <param name="direction">1 - left, 2 - up, 3 - right, 4 - down</param>
 			/// <returns>Moved point.</returns>
-			public Point Move (int direction) {
+			public Point Moved (int direction) {
 				switch (direction) {
 					case 1 : 
-						return new Point(x - 1, y);
-					case 2 :
 						return new Point(x, y - 1);
+					case 2 :
+						return new Point(x - 1, y);
 					case 3 : 
-						return new Point(x + 1, y);
-					case 4 : 
 						return new Point(x, y + 1);
+					case 4 : 
+						return new Point(x + 1, y);
 				}
 
 				throw new Exception("Illegal direction!");
@@ -41,18 +42,67 @@ namespace Test2 {
 				return string.Format("Point(x = {0}, y = {1})", x, y);
 			}
 
+			public static bool operator == (Point p1, Point p2) {
+				if ((object) p1 == null || (object) p2 == null)
+					return false;
+
+				return p1.x == p2.x && p1.y == p2.y;
+			}
+
+			public static bool operator != (Point p1, Point p2) {
+				return !(p1 == p2);
+			}
 		}
 
-		private bool[,] walls;
+		private class State {
 
-		private Point playerPos;
-		private Point boxPos;
-		private Point targetPos;
+			public Point playerPos;
+			public Point boxPos;
+			public Point targetPos;
 
-		private int width;
-		private int height;
+			public readonly List<int> path;
+
+			public State () {
+				path = new List<int>();
+			}
+
+			public State (State state, int moveDir) {
+				path = new List<int>(state.path) { moveDir };
+
+				targetPos = state.targetPos;
+				boxPos = state.boxPos;
+
+				playerPos = state.playerPos.Moved(moveDir);
+
+				if (boxPos == playerPos)
+					boxPos = boxPos.Moved(moveDir);
+			}
+
+			public bool IsLegal {
+				get {
+					return IsPointLegal(playerPos) &&
+					       IsPointLegal(boxPos) &&
+					       !walls[playerPos.x, playerPos.y] &&
+					       !walls[boxPos.x, boxPos.y];
+				}
+			}
+
+			public bool IsSuccess {
+				get { return boxPos == targetPos; }
+			}
+
+		}
+
+		private static bool[,] walls;
+
+		private State initState;
+
+		private static int width;
+		private static int height;
 
 		public void Load (string filename) {
+			initState = new State();
+
 			string[] lines = File.ReadAllLines(filename);
 
 			height = lines.Length;
@@ -71,36 +121,47 @@ namespace Test2 {
 
 					switch (lines[i][j]) {
 						case '1' :
-							boxPos = new Point(i, j);
+							initState.boxPos = new Point(i, j);
 							break;
 						case '2' :
-							targetPos = new Point(i, j);
+							initState.targetPos = new Point(i, j);
 							break;
 						case '4' :
-							playerPos = new Point(i, j);
+							initState.playerPos = new Point(i, j);
 							break;
 					}
 				}
 			}
-
-			Console.WriteLine("Width: {0}, Height: {1}\n" +
-			                  "Target: {2}, Box: {3}, Player: {4}",
-			                  width,
-			                  height,
-			                  targetPos,
-			                  boxPos,
-			                  playerPos);
 		}
 		
-		private bool IsPointLegal (Point point) {
+		private static bool IsPointLegal (Point point) {
 			return point.x >= 0 && point.y >= 0 && point.x < width && point.y < height;
 		}
 
 		public int[] Solve () {
-			//TODO: implement logic
-			return null;
-		}
+			List<State> states = new List<State> { initState };
 
+			while (true) {
+				List<State> newStates = new List<State>();
+
+				foreach (State state in states) {
+					for (int i = 1; i != 5; i++) {
+						State newState = new State(state, i);
+
+						if (newState.IsSuccess)
+							return newState.path.ToArray();
+
+						if (!newState.IsLegal)
+							continue;
+
+						newStates.Add(newState);
+					}
+				}
+
+				states = newStates;
+			}
+		}
+		
 	}
 
 }

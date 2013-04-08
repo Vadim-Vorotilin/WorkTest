@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace Test2 {
 	
@@ -10,6 +11,15 @@ namespace Test2 {
 
 			Sokoban sokoban = new Sokoban();
 			sokoban.Load(InFilename);
+
+			DateTime sTime = DateTime.Now;
+
+			int[] result = sokoban.Solve();
+
+			DateTime eTime = DateTime.Now;
+
+			Console.WriteLine(result.Aggregate("", (s, i) => s + i + ", "));
+			Console.WriteLine("Time spent: {0} ms", (eTime - sTime).TotalMilliseconds);
 
 			Console.ReadKey();
 
